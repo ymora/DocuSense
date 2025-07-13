@@ -81,12 +81,15 @@ def upload_and_analyse():
     filename = secure_filename(file.filename)
     filepath = os.path.join(UPLOAD_FOLDER, filename)
     file.save(filepath)
+    print(f"Fichier sauvegardé : {filepath}")
+    print("Existe avant suppression ?", os.path.exists(filepath))
 
     try:
         document_text = read_file(filepath)
     except Exception as e:
         if os.path.exists(filepath):
             os.remove(filepath)
+            print(f"Fichier supprimé : {filepath}")
         return jsonify({"error": f"Erreur lecture document : {str(e)}"}), 500
 
     final_prompt = prompt_content.replace("{{document}}", document_text[:4000])
