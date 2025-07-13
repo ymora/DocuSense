@@ -1,6 +1,6 @@
 # Licence MIT (traduction française)
 
-Droits d’auteur (c) 2025 Yann Morat
+Droits d’auteur (c) 2025 Yannick Mora
 
 Par la présente, il est accordé gratuitement à toute personne obtenant une copie
 de ce logiciel et des fichiers de documentation associés (le « Logiciel »), le droit

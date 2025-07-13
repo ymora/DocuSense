@@ -1,1 +1,43 @@
-{}
+{
+  "package": {
+    "productName": "DocuSense",
+    "version": "0.1.0",
+    "authors": ["Yannick Mora"]
+  },
+  "tauri": {
+    "windows": [
+      {
+        "title": "DocuSense",
+        "width": 1024,
+        "height": 768,
+        "resizable": true,
+        "fullscreen": false
+      }
+    ],
+    "security": {
+      "csp": "default-src 'self'"
+    },
+    "updater": {
+      "active": false
+    },
+    "allowlist": {
+      "all": false,
+      "fs": {
+        "readFile": true,
+        "writeFile": true,
+        "readDir": true,
+        "createDir": true,
+        "removeFile": true,
+        "removeDir": true
+      }
+    },
+    "bundle": {
+      "identifier": "com.ymora.docusense",
+      "icon": [
+        "icons/icon.png"
+      ],
+      "resources": [],
+      "category": "Utility"
+    }
+  }
+}
