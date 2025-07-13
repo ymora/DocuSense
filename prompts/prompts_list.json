@@ -5,7 +5,7 @@
     "category": "Résumé",
     "language": "fr",
     "description": "Synthèse claire et factuelle des échanges email, avec suivi précis des demandes et réponses.",
-    "content_file": "prompts/email_summary_fr.txt"
+    "content_file": "email_summary_fr.txt"
   },
   {
     "id": "pdf_word_summary_fr",
@@ -13,6 +13,6 @@
     "category": "Résumé",
     "language": "fr",
     "description": "Résumé factuel et structuré des documents PDF ou Word, avec extraction des points clés.",
-    "content_file": "prompts/pdf_word_summary_fr.txt"
+    "content_file": "pdf_word_summary_fr.txt"
   }
 ]
