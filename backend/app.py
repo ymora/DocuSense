@@ -2,7 +2,7 @@ import os
 import json
 from flask import Flask, request, jsonify
 from werkzeug.utils import secure_filename
-from openai_utils import read_docx, client
+from openai_utils import read_docx, read_pdf, read_eml, read_txt, read_excel, client  # à adapter selon tes fonctions
 
 app = Flask(__name__)
 
@@ -10,7 +10,30 @@ UPLOAD_FOLDER = "uploads"
 PROMPTS_FOLDER = "prompts"
 PROMPTS_LIST_FILE = os.path.join(PROMPTS_FOLDER, "prompts_list.json")
 
+ALLOWED_EXTENSIONS = {"pdf", "docx", "doc", "eml", "txt", "xls", "xlsx"}
+
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+
+
+def allowed_file(filename):
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+
+def read_file(filepath):
+    ext = filepath.rsplit('.', 1)[1].lower()
+    if ext == "docx" or ext == "doc":
+        return read_docx(filepath)
+    elif ext == "pdf":
+        return read_pdf(filepath)
+    elif ext == "eml":
+        return read_eml(filepath)
+    elif ext == "txt":
+        return read_txt(filepath)
+    elif ext == "xls" or ext == "xlsx":
+        return read_excel(filepath)
+    else:
+        raise ValueError(f"Type de fichier non supporté : .{ext}")
+
 
 def load_prompts():
     try:
@@ -20,11 +43,12 @@ def load_prompts():
         print(f"Erreur chargement prompts list: {e}")
         return []
 
+
 @app.route("/api/prompts", methods=["GET"])
 def get_prompts():
     prompts = load_prompts()
-    # On renvoie les métadonnées, sans contenu txt ici
     return jsonify(prompts)
+
 
 @app.route("/api/analyse", methods=["POST"])
 def upload_and_analyse():
@@ -34,6 +58,9 @@ def upload_and_analyse():
     file = request.files["file"]
     if file.filename == "":
         return jsonify({"error": "Nom de fichier vide"}), 400
+
+    if not allowed_file(file.filename):
+        return jsonify({"error": f"Extension non autorisée. Extensions autorisées : {', '.join(ALLOWED_EXTENSIONS)}"}), 400
 
     prompt_id = request.form.get("prompt_id")
     if not prompt_id:
@@ -56,9 +83,10 @@ def upload_and_analyse():
     file.save(filepath)
 
     try:
-        document_text = read_docx(filepath)
+        document_text = read_file(filepath)
     except Exception as e:
-        os.remove(filepath)
+        if os.path.exists(filepath):
+            os.remove(filepath)
         return jsonify({"error": f"Erreur lecture document : {str(e)}"}), 500
 
     final_prompt = prompt_content.replace("{{document}}", document_text[:4000])
@@ -74,15 +102,15 @@ def upload_and_analyse():
         )
         result = response.choices[0].message.content.strip()
     except Exception as e:
-        os.remove(filepath)
+        if os.path.exists(filepath):
+            os.remove(filepath)
         return jsonify({"error": f"Erreur API OpenAI : {str(e)}"}), 500
     finally:
-        try:
+        if os.path.exists(filepath):
             os.remove(filepath)
-        except Exception:
-            pass
 
     return jsonify({"resultat": result})
+
 
 if __name__ == "__main__":
     app.run(debug=True, host="0.0.0.0", port=5000)

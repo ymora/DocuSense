@@ -1,2 +1,21 @@
-flask
-openai
+# === Librairies principales pour DocuSense ===
+
+openai               # Appels à l'API OpenAI (chat, completions)
+python-dotenv        # Chargement des variables d’environnement (.env)
+Flask                # Framework web backend pour gérer les routes API
+Werkzeug             # Utilitaire Flask pour sécuriser les noms de fichiers uploadés
+
+# === Lecture et traitement de documents ===
+
+python-docx          # Lecture du contenu des fichiers .docx
+pymupdf              # Lecture et extraction de texte des fichiers PDF (via import fitz)
+pandas               # Manipulation de tableaux, lecture .xls/.xlsx (Excel)
+
+# === Autres utiles (optionnels mais recommandés) ===
+
+openpyxl             # Moteur recommandé par pandas pour lire les .xlsx
+xlrd                 # Pour la lecture des anciens fichiers Excel (.xls)
+
+# === Dev/Debug (optionnels) ===
+
+ipython              # Shell interactif plus pratique (debug/test rapide)
