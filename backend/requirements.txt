@@ -1,9 +1,9 @@
 # === Librairies principales pour DocuSense ===
 
-openai               # Appels à l'API OpenAI (chat, completions)
-python-dotenv        # Chargement des variables d’environnement (.env)
 Flask                # Framework web backend pour gérer les routes API
 Werkzeug             # Utilitaire Flask pour sécuriser les noms de fichiers uploadés
+openai               # Appels à l'API OpenAI (chat, completions)
+python-dotenv        # Chargement des variables d’environnement (.env)
 
 # === Lecture et traitement de documents ===
 
