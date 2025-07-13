@@ -1,0 +1,18 @@
+[
+  {
+    "id": "email_summary_fr",
+    "title": "Synthèse Emails (FR)",
+    "category": "Résumé",
+    "language": "fr",
+    "description": "Synthèse claire et factuelle des échanges email, avec suivi précis des demandes et réponses.",
+    "content_file": "prompts/email_summary_fr.txt"
+  },
+  {
+    "id": "pdf_word_summary_fr",
+    "title": "Résumé PDF/Word (FR)",
+    "category": "Résumé",
+    "language": "fr",
+    "description": "Résumé factuel et structuré des documents PDF ou Word, avec extraction des points clés.",
+    "content_file": "prompts/pdf_word_summary_fr.txt"
+  }
+]

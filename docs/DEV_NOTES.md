@@ -111,3 +111,18 @@ Permettre à l’utilisateur d’envoyer facilement des documents depuis son sma
 ---
 
 *Ce fichier évoluera au fur et à mesure des échanges et du développement.*
+
+## Décision : Prompts personnalisables dans le frontend
+
+- L'utilisateur pourra choisir un prompt pré-défini ou le modifier avant lancement.
+- Les prompts seront organisés par type d'analyse (résumé, extraction, simplification…).
+- Le frontend affichera une liste dynamique récupérée depuis le backend.
+- Les prompts seront stockés dans `/prompts/` (format `.txt` et `.json` pour les métadonnées).
+- Objectif : rendre l'application puissante tout en restant simple à utiliser.
+
+### 📂 Dossier `uploads/`
+
+Les fichiers envoyés via l’API sont temporairement stockés dans le dossier `/uploads/` à la racine du projet.
+- Le dossier est automatiquement créé si nécessaire.
+- Les fichiers sont supprimés automatiquement après traitement pour garantir la confidentialité.
+- Ce répertoire ne contient pas les fichiers d’exemple fournis (voir `client_files/`).
