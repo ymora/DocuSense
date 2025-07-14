@@ -1,21 +1,26 @@
 # === Librairies principales pour DocuSense ===
 
-Flask                # Framework web backend pour gérer les routes API
-Werkzeug             # Utilitaire Flask pour sécuriser les noms de fichiers uploadés
-openai               # Appels à l'API OpenAI (chat, completions)
-python-dotenv        # Chargement des variables d’environnement (.env)
+Flask>=2.3.0                   # Framework web léger pour créer l'API backend
+Werkzeug>=2.3.0                # Fournit secure_filename et d'autres outils WSGI
+openai>=1.2.3                  # Client officiel OpenAI pour interagir avec GPT (chat/completions)
+python-dotenv>=1.0.0           # Charge les variables d’environnement depuis un fichier .env
 
 # === Lecture et traitement de documents ===
 
-python-docx          # Lecture du contenu des fichiers .docx
-pymupdf              # Lecture et extraction de texte des fichiers PDF (via import fitz)
-pandas               # Manipulation de tableaux, lecture .xls/.xlsx (Excel)
+python-docx>=0.8.11            # Pour lire et extraire le texte des fichiers Word (.docx)
+pymupdf>=1.22.0                # Alias 'fitz' — Lecture et parsing de fichiers PDF
+pandas>=2.0.0                  # Pour lire et manipuler des tableaux Excel ou autres structures tabulaires
 
-# === Autres utiles (optionnels mais recommandés) ===
+# === Traitement de fichiers Excel ===
 
-openpyxl             # Moteur recommandé par pandas pour lire les .xlsx
-xlrd                 # Pour la lecture des anciens fichiers Excel (.xls)
+openpyxl>=3.1.0                # Moteur recommandé par pandas pour lire les fichiers .xlsx
+xlrd>=2.0.1                    # Nécessaire pour lire les anciens fichiers Excel (.xls)
 
-# === Dev/Debug (optionnels) ===
+# === Détection automatique d'encodage (optionnelle) ===
 
-ipython              # Shell interactif plus pratique (debug/test rapide)
+chardet>=5.1.0                 # Pour détecter automatiquement l'encodage de fichiers texte (.txt)
+
+# === Outils de développement (facultatifs mais utiles) ===
+
+ipython>=8.10.0                # Shell interactif plus pratique pour tester du code rapidement
+python-magic-bin               # Pour détecter automatiquement le type MIME (nécessaire sous Windows uniquement)

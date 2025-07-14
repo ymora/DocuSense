@@ -1,52 +1,55 @@
 import os
 import json
+import hashlib
+import shutil
+from datetime import datetime
 from flask import Flask, request, jsonify
 from werkzeug.utils import secure_filename
-from openai_utils import read_docx, read_pdf, read_eml, read_txt, read_excel, client  # à adapter selon tes fonctions
+from openai_utils import analyse_document
 
 app = Flask(__name__)
 
 UPLOAD_FOLDER = "uploads"
-PROMPTS_FOLDER = "prompts"
-PROMPTS_LIST_FILE = os.path.join(PROMPTS_FOLDER, "prompts_list.json")
-
+ARCHIVE_FOLDER = "client_files"
+PROMPTS_JSON = os.path.join("prompts", "prompts_list.json")
 ALLOWED_EXTENSIONS = {"pdf", "docx", "doc", "eml", "txt", "xls", "xlsx"}
 
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+os.makedirs(ARCHIVE_FOLDER, exist_ok=True)
 
 
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 
-def read_file(filepath):
-    ext = filepath.rsplit('.', 1)[1].lower()
-    if ext == "docx" or ext == "doc":
-        return read_docx(filepath)
-    elif ext == "pdf":
-        return read_pdf(filepath)
-    elif ext == "eml":
-        return read_eml(filepath)
-    elif ext == "txt":
-        return read_txt(filepath)
-    elif ext == "xls" or ext == "xlsx":
-        return read_excel(filepath)
-    else:
-        raise ValueError(f"Type de fichier non supporté : .{ext}")
+def file_hash(filepath, block_size=65536):
+    sha256 = hashlib.sha256()
+    with open(filepath, 'rb') as f:
+        while chunk := f.read(block_size):
+            sha256.update(chunk)
+    return sha256.hexdigest()
 
 
-def load_prompts():
-    try:
-        with open(PROMPTS_LIST_FILE, "r", encoding="utf-8") as f:
-            return json.load(f)
-    except Exception as e:
-        print(f"Erreur chargement prompts list: {e}")
+def load_prompts_metadata():
+    if not os.path.exists(PROMPTS_JSON):
         return []
+    with open(PROMPTS_JSON, 'r', encoding='utf-8') as f:
+        prompts = json.load(f)
+    return [
+        {
+            "id": p.get("id"),
+            "titre": p.get("titre"),
+            "categorie": p.get("categorie"),
+            "langue": p.get("langue"),
+            "description": p.get("description")
+        }
+        for p in prompts
+    ]
 
 
 @app.route("/api/prompts", methods=["GET"])
 def get_prompts():
-    prompts = load_prompts()
+    prompts = load_prompts_metadata()
     return jsonify(prompts)
 
 
@@ -60,60 +63,44 @@ def upload_and_analyse():
         return jsonify({"error": "Nom de fichier vide"}), 400
 
     if not allowed_file(file.filename):
-        return jsonify({"error": f"Extension non autorisée. Extensions autorisées : {', '.join(ALLOWED_EXTENSIONS)}"}), 400
+        return jsonify({"error": "Extension non autorisée"}), 400
 
     prompt_id = request.form.get("prompt_id")
     if not prompt_id:
         return jsonify({"error": "prompt_id manquant"}), 400
 
-    prompts = load_prompts()
-    prompt_meta = next((p for p in prompts if p["id"] == prompt_id), None)
-    if not prompt_meta:
-        return jsonify({"error": "Prompt non trouvé"}), 400
+    # Sauvegarde temporaire dans uploads sous nom temporaire
+    temp_path = os.path.join(UPLOAD_FOLDER, "temp_" + secure_filename(file.filename))
+    file.save(temp_path)
 
-    prompt_path = os.path.join(PROMPTS_FOLDER, prompt_meta["content_file"])
-    if not os.path.isfile(prompt_path):
-        return jsonify({"error": "Fichier prompt introuvable"}), 500
+    # Calcul hash
+    h = file_hash(temp_path)
+    ext = os.path.splitext(file.filename)[1].lower()
+    date_str = datetime.now().strftime("%y%m%d")
 
-    with open(prompt_path, "r", encoding="utf-8") as f:
-        prompt_content = f.read()
+    new_filename = f"{date_str}-{h}-{secure_filename(file.filename)}"
+    new_path = os.path.join(UPLOAD_FOLDER, new_filename)
 
-    filename = secure_filename(file.filename)
-    filepath = os.path.join(UPLOAD_FOLDER, filename)
-    file.save(filepath)
-    print(f"Fichier sauvegardé : {filepath}")
-    print("Existe avant suppression ?", os.path.exists(filepath))
-
-    try:
-        document_text = read_file(filepath)
-    except Exception as e:
-        if os.path.exists(filepath):
-            os.remove(filepath)
-            print(f"Fichier supprimé : {filepath}")
-        return jsonify({"error": f"Erreur lecture document : {str(e)}"}), 500
-
-    final_prompt = prompt_content.replace("{{document}}", document_text[:4000])
+    # Renommage fichier uploadé
+    if not os.path.exists(new_path):
+        os.rename(temp_path, new_path)
+    else:
+        os.remove(temp_path)
 
     try:
-        response = client.chat.completions.create(
-            model="gpt-4",
-            messages=[
-                {"role": "system", "content": "Tu es un assistant juridique intelligent."},
-                {"role": "user", "content": final_prompt}
-            ],
-            temperature=0.2,
-        )
-        result = response.choices[0].message.content.strip()
+        # Analyse sur le fichier renommé
+        result = analyse_document(new_path, prompt_id)
+
+        # Déplacement vers archive si succès
+        archive_path = os.path.join(ARCHIVE_FOLDER, new_filename)
+        if not os.path.exists(archive_path):
+            shutil.move(new_path, archive_path)
+
     except Exception as e:
-        if os.path.exists(filepath):
-            os.remove(filepath)
-        return jsonify({"error": f"Erreur API OpenAI : {str(e)}"}), 500
-    finally:
-        if os.path.exists(filepath):
-            os.remove(filepath)
+        failed_filename = f"{date_str}-{h}-{secure_filename(file.filename)}-failed{ext}"
+        failed_path = os.path.join(UPLOAD_FOLDER, failed_filename)
+        if os.path.exists(new_path):
+            os.rename(new_path, failed_path)
+        return jsonify({"error": f"Erreur lors de l'analyse : {str(e)}"}), 500
 
     return jsonify({"resultat": result})
-
-
-if __name__ == "__main__":
-    app.run(debug=True, host="0.0.0.0", port=5000)

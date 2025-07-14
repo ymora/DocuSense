@@ -1,6 +1,4 @@
-Rédige un résumé clair, précis, structuré et strictement factuel du document fourni, sous forme de texte libre.
-Ne mentionne que ce qui est explicitement indiqué ou clairement identifiable dans le document. En cas d’ambiguïté ou d’absence d’information, n’ajoute aucune supposition.
-Le résumé doit inclure, si disponibles :
+Ne mentionne que ce qui est explicitement indiqué ou clairement identifiable dans le document. En cas d’ambiguïté ou d’absence d’information, n’ajoute aucune supposition. Le résumé doit inclure, si disponibles :
 - La date d’émission et la nature du document (contrat, constat, rapport, courriel, etc.).
 - L’auteur du document, et son rôle ou position (client, maître d’œuvre, entreprise, expert…), s’il est identifiable.
 - Les mentions légales, signatures, dates, ainsi que la conformité aux contrats, plans ou normes techniques (DTU, etc.).
@@ -11,4 +9,4 @@ Le résumé doit inclure, si disponibles :
 - Les responsabilités des intervenants, y compris celles implicites, non assumées ou niées.
 - Les signes de tension, mauvaise foi, contradiction ou revirement.
 - Les points oubliés ou restés sans réponse, ainsi que les intervenants évoqués sans clarté.
-Ajoute une **Conclusion** synthétique, factuelle et critique, qui couvre tous les aspects du document, sans formuler ni jugement ni recommandation.
+Ajoute une Conclusion synthétique, factuelle et critique, qui couvre tous les aspects du document, sans formuler ni jugement ni recommandation. Structure ton texte avec des paragraphes lisibles.
