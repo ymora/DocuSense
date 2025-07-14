@@ -3,15 +3,7 @@ import React from "react";
 export default function Button({ children, ...props }) {
   return (
     <button
-      style={{
-        backgroundColor: "#007bff",
-        border: "none",
-        color: "white",
-        padding: "10px 15px",
-        borderRadius: 4,
-        cursor: "pointer",
-        fontSize: 16,
-      }}
+      className="bg-accent text-white py-2 px-4 rounded-xl hover:bg-red-600 transition font-medium"
       {...props}
     >
       {children}

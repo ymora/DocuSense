@@ -1,9 +1,9 @@
 [
   {
     "id": "email_summary_fr",
-    "titre": "Synthèse Emails (FR)",
-    "categorie": "Résumé",
-    "langue": "fr",
+    "title": "Synthèse Emails (FR)",
+    "category": "Résumé",
+    "language": "fr",
     "description": "Synthèse claire et factuelle des échanges email.",
     "system_role": "Expert en analyse de documents professionnels, crée une synthèse claire et factuelle pour une analyse automatisée ultérieure.",
     "user_prompt": "",
@@ -13,9 +13,9 @@
   },
   {
     "id": "pdf_word_summary_fr",
-    "titre": "Résumé PDF/Word (FR)",
-    "categorie": "Résumé",
-    "langue": "fr",
+    "title": "Résumé PDF/Word (FR)",
+    "category": "Résumé",
+    "language": "fr",
     "description": "Résumé structuré des documents PDF ou Word.",
     "system_role": "Assistant pour rédiger un résumé clair, précis, structuré et strictement factuel du document fourni, sous forme de texte libre.",
     "user_prompt": "",
@@ -24,3 +24,4 @@
     "document_types": ["pdf", "docx", "doc"]
   }
 ]
+

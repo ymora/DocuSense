@@ -1,17 +1,8 @@
 import React from "react";
 
-export default function Card({ children, style }) {
+export default function Card({ children }) {
   return (
-    <div
-      style={{
-        border: "1px solid #ccc",
-        borderRadius: 8,
-        padding: 16,
-        boxShadow: "0 2px 5px rgba(0,0,0,0.1)",
-        backgroundColor: "#fff",
-        ...style,
-      }}
-    >
+    <div className="bg-white shadow-soft rounded-2xl p-6 mt-4 border border-gray-300">
       {children}
     </div>
   );

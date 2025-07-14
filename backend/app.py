@@ -38,9 +38,9 @@ def load_prompts_metadata():
     return [
         {
             "id": p.get("id"),
-            "titre": p.get("titre"),
-            "categorie": p.get("categorie"),
-            "langue": p.get("langue"),
+            "title": p.get("title"),
+            "category": p.get("category"),
+            "language": p.get("language"),
             "description": p.get("description")
         }
         for p in prompts
