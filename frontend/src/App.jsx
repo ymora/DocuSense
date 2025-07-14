@@ -35,9 +35,38 @@ export default function App() {
     setLoading(true);
     try {
       const res = await sendAnalysis(file, selectedPromptId);
+
+      // Cas où le backend demande une confirmation OCR
+      if (res.confirmation_required) {
+        const userConfirmed = window.confirm(res.message);
+        if (userConfirmed) {
+          // Relancer l'analyse avec l'option OCR activée
+          await handleSubmitWithOCR();
+        } else {
+          setError("Analyse annulée par l'utilisateur.");
+          setLoading(false);
+        }
+        return;
+      }
+
+      // Sinon afficher le résultat normal
       setResult(res.resultat || JSON.stringify(res));
     } catch (err) {
       setError(err.message || "Erreur lors de l’analyse");
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function handleSubmitWithOCR() {
+    setError(null);
+    setResult(null);
+    setLoading(true);
+    try {
+      const res = await sendAnalysis(file, selectedPromptId, { use_ocr: true });
+      setResult(res.resultat || JSON.stringify(res));
+    } catch (err) {
+      setError(err.message || "Erreur lors de l’analyse OCR");
     } finally {
       setLoading(false);
     }
@@ -60,7 +89,7 @@ export default function App() {
             <option value="">-- Sélectionner --</option>
             {prompts.map((p) => (
               <option key={p.id} value={p.id}>
-                {p.title} ({p.language}) - {p.category}
+                {p.description} ({p.language})
               </option>
             ))}
           </select>

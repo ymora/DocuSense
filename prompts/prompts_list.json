@@ -1,7 +1,7 @@
 [
   {
     "id": "email_summary_fr",
-    "title": "Synthèse Emails (FR)",
+    "title": "Synthèse Emails",
     "category": "Résumé",
     "language": "fr",
     "description": "Synthèse claire et factuelle des échanges email.",
@@ -13,7 +13,7 @@
   },
   {
     "id": "pdf_word_summary_fr",
-    "title": "Résumé PDF/Word (FR)",
+    "title": "Résumé PDF/Word",
     "category": "Résumé",
     "language": "fr",
     "description": "Résumé structuré des documents PDF ou Word.",

@@ -5,7 +5,16 @@ import shutil
 from datetime import datetime
 from flask import Flask, request, jsonify
 from werkzeug.utils import secure_filename
-from openai_utils import analyse_document
+from openai_utils import analyse_document  # à adapter ou remplacer selon usage
+import fitz
+import pytesseract
+from PIL import Image
+from pdf2image import convert_from_path
+import tempfile
+import pandas as pd
+from docx import Document
+import email
+from email import policy
 
 app = Flask(__name__)
 
@@ -53,6 +62,100 @@ def get_prompts():
     return jsonify(prompts)
 
 
+def read_docx(path):
+    doc = Document(path)
+    return "\n".join([p.text for p in doc.paragraphs]).strip()
+
+
+def read_pdf(path):
+    doc = fitz.open(path)
+    return "".join(page.get_text() for page in doc).strip()
+
+
+def read_eml(path):
+    with open(path, "rb") as f:
+        msg = email.message_from_binary_file(f, policy=policy.default)
+    if msg.is_multipart():
+        parts = [p.get_content() for p in msg.walk() if p.get_content_type() == "text/plain"]
+        return "\n".join(parts).strip()
+    return msg.get_content().strip()
+
+
+def read_txt(path):
+    with open(path, "r", encoding="utf-8") as f:
+        return f.read().strip()
+
+
+def read_excel(path):
+    xls = pd.ExcelFile(path)
+    text = ""
+    for sheet in xls.sheet_names:
+        df = pd.read_excel(xls, sheet_name=sheet)
+        text += f"\n-- Feuille: {sheet} --\n"
+        text += df.fillna('').astype(str).agg(' '.join, axis=1).str.cat(sep='\n')
+    return text.strip()
+
+
+def read_file(path):
+    ext = path.rsplit(".", 1)[1].lower()
+    match ext:
+        case "pdf":
+            return read_pdf(path)
+        case "doc" | "docx":
+            return read_docx(path)
+        case "eml":
+            return read_eml(path)
+        case "txt":
+            return read_txt(path)
+        case "xls" | "xlsx":
+            return read_excel(path)
+        case _:
+            raise ValueError(f"Type de fichier non supporté : .{ext}")
+
+
+def perform_ocr(path):
+    ext = path.rsplit(".", 1)[1].lower()
+    text = ""
+
+    if ext == "pdf":
+        # Convertir PDF en images
+        images = convert_from_path(path)
+        for img in images:
+            text += pytesseract.image_to_string(img, lang='fra') + "\n"
+    else:
+        # Pour images ou autres fichiers, ouvrir avec PIL
+        img = Image.open(path)
+        text = pytesseract.image_to_string(img, lang='fra')
+
+    return text.strip()
+
+
+def analyse_document_with_text(text, prompt_id):
+    # Charge les métadonnées du prompt
+    with open(PROMPTS_JSON, "r", encoding="utf-8") as f:
+        prompts = json.load(f)
+    prompt_meta = next((p for p in prompts if p["id"] == prompt_id), None)
+    if not prompt_meta:
+        raise ValueError(f"Prompt introuvable : {prompt_id}")
+
+    prompt_path = prompt_meta.get("content_file")
+    if not prompt_path or not os.path.exists(prompt_path):
+        raise FileNotFoundError(f"Fichier de prompt manquant : {prompt_path}")
+
+    with open(prompt_path, "r", encoding="utf-8") as f:
+        prompt_content = f.read()
+
+    max_chars = prompt_meta.get("max_chars", 4000)
+
+    final_prompt = f"{prompt_content}\n\nContenu du document :\n{text[:max_chars]}"
+
+    # Utilise ici ta fonction d'appel OpenAI habituelle (exemple simplifié)
+    response = analyse_document(final_prompt, prompt_meta["system_role"])  
+    # Tu peux adapter analyse_document pour prendre le prompt complet + rôle system
+
+    return response.strip()
+
+
 @app.route("/api/analyse", methods=["POST"])
 def upload_and_analyse():
     if "file" not in request.files:
@@ -69,11 +172,11 @@ def upload_and_analyse():
     if not prompt_id:
         return jsonify({"error": "prompt_id manquant"}), 400
 
-    # Sauvegarde temporaire dans uploads sous nom temporaire
+    use_ocr = request.form.get("use_ocr", "false").lower() == "true"
+
     temp_path = os.path.join(UPLOAD_FOLDER, "temp_" + secure_filename(file.filename))
     file.save(temp_path)
 
-    # Calcul hash
     h = file_hash(temp_path)
     ext = os.path.splitext(file.filename)[1].lower()
     date_str = datetime.now().strftime("%y%m%d")
@@ -81,17 +184,27 @@ def upload_and_analyse():
     new_filename = f"{date_str}-{h}-{secure_filename(file.filename)}"
     new_path = os.path.join(UPLOAD_FOLDER, new_filename)
 
-    # Renommage fichier uploadé
     if not os.path.exists(new_path):
         os.rename(temp_path, new_path)
     else:
         os.remove(temp_path)
 
     try:
-        # Analyse sur le fichier renommé
-        result = analyse_document(new_path, prompt_id)
+        doc_text = read_file(new_path)
 
-        # Déplacement vers archive si succès
+        if not doc_text.strip():
+            if not use_ocr:
+                return jsonify({
+                    "confirmation_required": True,
+                    "message": "Pas de texte détecté (doc scanné ?). Voulez-vous extraire le texte avec OCR ?"
+                }), 200
+
+            doc_text = perform_ocr(new_path)
+            if not doc_text.strip():
+                return jsonify({"error": "Même après OCR, aucun texte détecté."}), 400
+
+        result = analyse_document_with_text(doc_text, prompt_id)
+
         archive_path = os.path.join(ARCHIVE_FOLDER, new_filename)
         if not os.path.exists(archive_path):
             shutil.move(new_path, archive_path)
@@ -104,3 +217,7 @@ def upload_and_analyse():
         return jsonify({"error": f"Erreur lors de l'analyse : {str(e)}"}), 500
 
     return jsonify({"resultat": result})
+
+
+if __name__ == "__main__":
+    app.run(debug=True, host="0.0.0.0", port=5000)

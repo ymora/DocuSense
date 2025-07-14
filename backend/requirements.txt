@@ -1,26 +1,27 @@
 # === Librairies principales pour DocuSense ===
-
 Flask>=2.3.0                   # Framework web léger pour créer l'API backend
 Werkzeug>=2.3.0                # Fournit secure_filename et d'autres outils WSGI
 openai>=1.2.3                  # Client officiel OpenAI pour interagir avec GPT (chat/completions)
 python-dotenv>=1.0.0           # Charge les variables d’environnement depuis un fichier .env
 
 # === Lecture et traitement de documents ===
-
 python-docx>=0.8.11            # Pour lire et extraire le texte des fichiers Word (.docx)
 pymupdf>=1.22.0                # Alias 'fitz' — Lecture et parsing de fichiers PDF
 pandas>=2.0.0                  # Pour lire et manipuler des tableaux Excel ou autres structures tabulaires
 
 # === Traitement de fichiers Excel ===
-
 openpyxl>=3.1.0                # Moteur recommandé par pandas pour lire les fichiers .xlsx
-xlrd>=2.0.1                    # Nécessaire pour lire les anciens fichiers Excel (.xls)
+xlrd>=2.0.1                   # Nécessaire pour lire les anciens fichiers Excel (.xls)
 
 # === Détection automatique d'encodage (optionnelle) ===
+chardet>=5.1.0                # Pour détecter automatiquement l'encodage de fichiers texte (.txt)
 
-chardet>=5.1.0                 # Pour détecter automatiquement l'encodage de fichiers texte (.txt)
+# === Librairies pour traitement PDF scanné / OCR ===
+Pillow>=9.0.0                 # Librairie d’image Python (fork de PIL)
+pdf2image>=1.16.0             # Convertit les pages PDF en images (utile pour OCR)
+pytesseract>=0.3.10           # Wrapper Python pour Tesseract OCR
 
 # === Outils de développement (facultatifs mais utiles) ===
+ipython>=8.10.0               # Shell interactif plus pratique pour tester du code rapidement
+python-magic-bin              # Pour détecter automatiquement le type MIME (nécessaire sous Windows uniquement)
 
-ipython>=8.10.0                # Shell interactif plus pratique pour tester du code rapidement
-python-magic-bin               # Pour détecter automatiquement le type MIME (nécessaire sous Windows uniquement)

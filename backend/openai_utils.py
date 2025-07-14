@@ -71,6 +71,13 @@ def analyse_document(path, prompt_id):
         prompt_content = f.read()
 
     doc_text = read_file(path)
+    if not doc_text.strip():
+        if not doc_text.strip():
+            return {
+                "confirmation_required": True,
+                "message": "Pas de texte détecté (doc scanné ?) \n Voulez-vous essayer d'extraire le texte avec OCR ?"
+            }
+            
     max_chars = prompt_meta.get("max_chars", 4000)
 
     final_prompt = f"{prompt_content}\n\nContenu du document :\n{doc_text[:max_chars]}"
