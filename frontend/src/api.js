@@ -5,6 +5,7 @@ export async function fetchPrompts() {
 }
 
 export async function sendAnalysis(file, promptId, options = {}) {
+  console.log("Envoi analyse avec promptId =", promptId);
   const formData = new FormData();
   formData.append("file", file);
   formData.append("prompt_id", promptId);
