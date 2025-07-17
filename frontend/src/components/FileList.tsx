@@ -27,7 +27,7 @@ interface FileListProps {
   files?: FileItem[];
   onToggleSelect?: (id: string) => void;
   onDropFiles?: (files: File[]) => void;
-  className?: string;  // ajout className
+  className?: string;
 }
 
 export default function FileList({
