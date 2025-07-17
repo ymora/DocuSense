@@ -29,32 +29,39 @@ export default function LeftPanel({ files = [], onDropFiles }: LeftPanelProps) {
 
   return (
     <aside
-      className="p-4 w-1/4 bg-gray-50 border-r border-gray-200 overflow-y-auto"
+      className="w-1/4 p-6 bg-white border-r border-gray-200 shadow-inner flex flex-col"
       onDrop={handleDrop}
       onDragOver={(e) => e.preventDefault()}
     >
-      <h2 className="font-semibold mb-2">📁 Fichiers</h2>
-      <div className="border-2 border-dashed border-gray-300 rounded-md p-4 text-center text-sm text-gray-500 mb-4">
-        Glissez-déposez ou cliquez ici
+      <h2 className="text-xl font-bold mb-4">📁 Fichiers</h2>
+
+      <div className="border-2 border-dashed border-gray-300 rounded-xl p-4 text-center text-gray-500 text-sm mb-6 hover:bg-gray-100 cursor-pointer transition">
+        Glissez-déposez ici ou cliquez pour ajouter
       </div>
 
-      <ul className="space-y-2">
+      <ul className="space-y-3 overflow-y-auto max-h-[70vh] pr-1">
+        {files.length === 0 && (
+          <li className="text-sm text-gray-400 italic text-center">
+            Aucun fichier.
+          </li>
+        )}
         {files.map((file) => (
           <li
             key={file.id}
-            className="flex items-center justify-between bg-white shadow-sm p-2 rounded hover:bg-gray-100 transition"
+            className="flex justify-between items-center bg-gray-50 rounded-xl shadow p-3 hover:bg-gray-100 transition"
           >
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-3">
               <input
                 type="checkbox"
                 checked={file.selected}
                 onChange={() => file.onToggleSelect(file.id)}
+                className="cursor-pointer"
               />
-              <span className="truncate max-w-[140px]" title={file.name}>
+              <span className="truncate max-w-[140px] text-sm" title={file.name}>
                 {file.name}
               </span>
             </div>
-            <span>{statusIcons[file.status]}</span>
+            <span className="text-lg">{statusIcons[file.status]}</span>
           </li>
         ))}
       </ul>

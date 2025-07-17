@@ -1,8 +1,9 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import TopBar from "./components/TopBar";
 import FileList, { FileItem as FileItemType } from "./components/FileList";
 import ActionsPanel from "./components/ActionsPanel";
 import IAResultPanel from "./components/IAResultPanel";
+
 
 type FileStatus = "analysed" | "pending" | "failed" | "unprocessed";
 
@@ -61,20 +62,13 @@ const initialFiles: FileItem[] = [
 export default function App() {
   const [files, setFiles] = useState<FileItem[]>(initialFiles);
 
-  // Gérer la sélection des fichiers
   const toggleSelect = (id: string) => {
     setFiles((prev) =>
-      prev.map((f) =>
-        f.id === id ? { ...f, selected: !f.selected } : f
-      )
+      prev.map((f) => (f.id === id ? { ...f, selected: !f.selected } : f))
     );
   };
 
-  // Ajouter de nouveaux fichiers (ex: drag & drop)
   const addFiles = (newFiles: File[]) => {
-    // Création d'un ID simple ici (à améliorer en prod)
-    const nextId = (files.length + 1).toString();
-
     const filesToAdd: FileItem[] = newFiles.map((file, i) => ({
       id: (files.length + i + 1).toString(),
       name: file.name,
@@ -85,11 +79,9 @@ export default function App() {
     setFiles((prev) => [...prev, ...filesToAdd]);
   };
 
-  // Calculer le montant total des fichiers sélectionnés avec résumé
   const selectedFiles = files.filter((f) => f.selected);
   const totalAmount = selectedFiles.reduce((acc, file) => {
     if (file.resume?.montant) {
-      // On parse le montant en nombre (ex: "3 000 € HT" => 3000)
       const num = parseFloat(
         file.resume.montant.replace(/[^\d.,]/g, "").replace(",", ".")
       );
@@ -98,10 +90,8 @@ export default function App() {
     return acc;
   }, 0);
 
-  // Fichier sélectionné pour afficher résumé (le premier sélectionné)
   const selectedFile = selectedFiles.length > 0 ? selectedFiles[0] : null;
 
-  // Simuler génération synthèse (exemple simple)
   const handleGenerateSummary = () => {
     alert(
       `Génération de synthèse pour ${selectedFiles.length} fichier(s) — total ${totalAmount.toFixed(
@@ -110,63 +100,63 @@ export default function App() {
     );
   };
 
-  // Simuler réanalyse (change statut)
   const handleReanalyze = () => {
     setFiles((prev) =>
       prev.map((f) =>
-        f.selected && f.status !== "analysed"
-          ? { ...f, status: "pending" }
-          : f
+        f.selected && f.status !== "analysed" ? { ...f, status: "pending" } : f
       )
     );
     alert("Réanalyse lancée pour les fichiers sélectionnés.");
   };
 
-  // Simuler affichage historique synthèses
   const handleViewHistory = () => {
     alert("Affichage de l'historique des synthèses (à implémenter).");
   };
 
   return (
     <div className="flex flex-col h-screen">
+      {/* TopBar en haut */}
       <TopBar />
 
-      <div className="flex flex-1 overflow-hidden">
-        {/* Panel gauche: liste fichiers */}
-        <FileList
-          files={files}
-          onToggleSelect={toggleSelect}
-          onDropFiles={addFiles}
-        />
+      {/* Conteneur horizontal pour les 3 panels */}
+      <div className="flex flex-row flex-1 overflow-hidden">
+        {/* Panel gauche : FileList */}
+        <div className="w-1/4 border-r border-gray-200 overflow-auto">
+          <FileList files={files} onToggleSelect={toggleSelect} onDropFiles={addFiles} />
+        </div>
 
-        {/* Panel central: résumé IA fichier sélectionné */}
-        {selectedFile ? (
-          <IAResultPanel
-            fileName={selectedFile.name}
-            analysedDate={selectedFile.analysedDate ?? "-"}
-            iaMode={selectedFile.iaMode ?? "Locale"}
-            resume={
-              selectedFile.resume ?? {
-                client: "-",
-                date: "-",
-                objet: "-",
-                montant: "-",
-              }
-            }
+        {/* Panel centre : ActionsPanel */}
+        <div className="w-1/3 overflow-y-auto border-r p-4">
+          <ActionsPanel
+            selectedFilesCount={selectedFiles.length}
+            totalAmount={totalAmount}
+            onGenerateSummary={handleGenerateSummary}
+            onReanalyze={handleReanalyze}
           />
-        ) : (
-          <main className="flex-1 flex items-center justify-center text-gray-400 italic">
-            Aucun fichier sélectionné.
-          </main>
-        )}
+        </div>
 
-        {/* Panel droit: synthèse & actions */}
-        <ActionsPanel
-          selectedFilesCount={selectedFiles.length}
-          totalAmount={totalAmount}
-          onGenerateSummary={handleGenerateSummary}
-          onReanalyze={handleReanalyze}
-        />
+        {/* Panel droit : IAResultPanel */}
+        <div className="flex-1 overflow-auto">
+          {selectedFile ? (
+            <IAResultPanel
+              fileName={selectedFile.name}
+              analysedDate={selectedFile.analysedDate ?? "-"}
+              iaMode={selectedFile.iaMode ?? "Locale"}
+              resume={
+                selectedFile.resume ?? {
+                  client: "-",
+                  date: "-",
+                  objet: "-",
+                  montant: "-",
+                }
+              }
+            />
+          ) : (
+            <main className="flex h-full items-center justify-center text-gray-400 italic">
+              Aucun fichier sélectionné.
+            </main>
+          )}
+        </div>
       </div>
     </div>
   );

@@ -21,42 +21,40 @@ const IAResultPanel = ({
   resume,
 }: IAResultPanelProps) => {
   return (
-    <main className="flex-1 p-6">
-      <h2 className="text-lg font-semibold mb-4">🧠 Résumé IA du Fichier</h2>
+    <main className="flex-1 p-6 bg-gray-50">
+      <h2 className="text-xl font-bold mb-6">🧠 Résumé IA du Fichier</h2>
 
-      <div className="border rounded-lg p-4 bg-white shadow">
-        <div className="mb-2 text-sm">
+      <section className="bg-white rounded-xl shadow-md p-6 border border-gray-300 max-w-xl">
+        <div className="mb-4 text-sm text-gray-700 space-y-2">
           <p>
-            ✅ <strong>Fichier :</strong> {fileName}
+            ✅ <strong>Fichier :</strong> <span className="font-semibold">{fileName}</span>
           </p>
           <p>
-            📅 <strong>Analysé le :</strong> {analysedDate}
+            📅 <strong>Analysé le :</strong> <span className="font-semibold">{analysedDate}</span>
           </p>
           <p>
-            🤖 <strong>Mode IA :</strong> {iaMode}
+            🤖 <strong>Mode IA :</strong> <span className="font-semibold">{iaMode}</span>
           </p>
         </div>
 
-        <hr className="my-4" />
+        <hr className="my-6 border-gray-300" />
 
-        <div className="text-sm space-y-2">
+        <div className="text-sm text-gray-700 space-y-3">
+          <p className="font-semibold text-base">📄 Résumé :</p>
           <p>
-            <strong>📄 Résumé :</strong>
+            👤 <strong>Client :</strong> <span className="font-semibold">{resume.client}</span>
           </p>
           <p>
-            👤 <strong>Client :</strong> {resume.client}
+            📅 <strong>Date :</strong> <span className="font-semibold">{resume.date}</span>
           </p>
           <p>
-            📅 <strong>Date :</strong> {resume.date}
+            📝 <strong>Objet :</strong> <span className="font-semibold">{resume.objet}</span>
           </p>
           <p>
-            📝 <strong>Objet :</strong> {resume.objet}
-          </p>
-          <p>
-            💰 <strong>Montant :</strong> {resume.montant}
+            💰 <strong>Montant :</strong> <span className="font-semibold">{resume.montant}</span>
           </p>
         </div>
-      </div>
+      </section>
     </main>
   );
 };
