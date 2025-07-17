@@ -1,11 +1,19 @@
-export async function fetchPrompts() { 
+// src/api/index.ts
+
+export async function fetchPrompts() {
   const response = await fetch("/api/prompts");
-  if (!response.ok) throw new Error("Erreur lors du chargement des prompts");
+  if (!response.ok) {
+    throw new Error("Erreur lors du chargement des prompts");
+  }
   return response.json();
 }
 
-export async function sendAnalysis(file, promptId, options = {}) {
-  console.log("Envoi analyse avec promptId =", promptId);
+export async function sendAnalysis(
+  file: File,
+  promptId: string,
+  options: { use_ocr?: boolean } = {}
+) {
+  console.log("📤 Envoi analyse avec promptId =", promptId);
   const formData = new FormData();
   formData.append("file", file);
   formData.append("prompt_id", promptId);
