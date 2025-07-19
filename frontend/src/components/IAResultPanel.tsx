@@ -1,10 +1,10 @@
 import React from "react";
 
 interface Resume {
-  client: string;
-  date: string;
-  objet: string;
-  montant: string;
+  client?: string;
+  date?: string;
+  objet?: string;
+  montant?: string;
 }
 
 interface IAResultPanelProps {
@@ -12,6 +12,7 @@ interface IAResultPanelProps {
   analysedDate: string;
   iaMode: string;
   resume: Resume;
+  summary?: string;
 }
 
 const IAResultPanel = ({
@@ -19,43 +20,32 @@ const IAResultPanel = ({
   analysedDate,
   iaMode,
   resume,
+  summary,
 }: IAResultPanelProps) => {
   return (
-    <main className="flex-1 p-6 bg-gray-50">
-      <h2 className="text-xl font-bold mb-6">🧠 Résumé IA du Fichier</h2>
-
-      <section className="bg-white rounded-xl shadow-md p-6 border border-gray-300 max-w-xl">
-        <div className="mb-4 text-sm text-gray-700 space-y-2">
-          <p>
-            ✅ <strong>Fichier :</strong> <span className="font-semibold">{fileName}</span>
-          </p>
-          <p>
-            📅 <strong>Analysé le :</strong> <span className="font-semibold">{analysedDate}</span>
-          </p>
-          <p>
-            🤖 <strong>Mode IA :</strong> <span className="font-semibold">{iaMode}</span>
-          </p>
+    <aside className="w-full h-full bg-white border-2 border-indigo-400 shadow-xl rounded-xl p-8 flex flex-col justify-start">
+      <div className="w-full">
+        {/* Résumé IA complet en haut */}
+        <div className="mb-4">
+          <h3 className="font-semibold text-indigo-700 mb-2 text-lg">Résumé IA</h3>
+          {summary && summary !== 'Aucun résumé disponible' ? (
+            <pre className="whitespace-pre-wrap text-base text-gray-900 mb-2 leading-snug">{summary}</pre>
+          ) : (
+            <p className="text-gray-400 italic mb-2 leading-snug">Aucun résumé disponible</p>
+          )}
         </div>
-
-        <hr className="my-6 border-gray-300" />
-
-        <div className="text-sm text-gray-700 space-y-3">
-          <p className="font-semibold text-base">📄 Résumé :</p>
-          <p>
-            👤 <strong>Client :</strong> <span className="font-semibold">{resume.client}</span>
-          </p>
-          <p>
-            📅 <strong>Date :</strong> <span className="font-semibold">{resume.date}</span>
-          </p>
-          <p>
-            📝 <strong>Objet :</strong> <span className="font-semibold">{resume.objet}</span>
-          </p>
-          <p>
-            💰 <strong>Montant :</strong> <span className="font-semibold">{resume.montant}</span>
-          </p>
+        {/* Métadonnées en dessous, icônes adaptées, espacement fin */}
+        <div className="text-sm text-gray-700 space-y-0.5">
+          <div><span className="mr-1">📄</span><span className="font-semibold">Fichier :</span> {fileName}</div>
+          <div><span className="mr-1">📅</span><span className="font-semibold">Analysé le :</span> {analysedDate}</div>
+          <div><span className="mr-1">🤖</span><span className="font-semibold">Mode IA :</span> {iaMode}</div>
+          {resume.client && <div><span className="mr-1">👤</span><span className="font-semibold">Client :</span> {resume.client}</div>}
+          {resume.date && <div><span className="mr-1">📆</span><span className="font-semibold">Date :</span> {resume.date}</div>}
+          {resume.objet && <div><span className="mr-1">📝</span><span className="font-semibold">Objet :</span> {resume.objet}</div>}
+          <div><span className="mr-1">💰</span><span className="font-semibold">Montant :</span> {resume.montant && resume.montant !== '-' ? resume.montant : 'Sans objet'}</div>
         </div>
-      </section>
-    </main>
+      </div>
+    </aside>
   );
 };
 

@@ -1,0 +1,26 @@
+Analyse l'ensemble des documents fournis et crée une synthèse globale structurée :
+
+**Synthèse générale :**
+- Thème principal commun à tous les documents
+- Contexte global de la situation
+- Objectif général de l'ensemble documentaire
+
+**Points clés par document :**
+- Résumé de 2-3 points essentiels pour chaque document
+- Hiérarchisation par importance
+- Identification des synergies entre documents
+
+**Analyse transversale :**
+- Points communs entre les documents
+- Contradictions ou divergences identifiées
+- Évolution chronologique si applicable
+
+**Recommandations :**
+- Actions prioritaires à entreprendre
+- Points d'attention particuliers
+- Documents complémentaires nécessaires
+
+**Tableau récapitulatif :**
+- Document | Type | Points clés | Urgence | Actions requises
+
+Présente une synthèse claire, structurée et actionnable de l'ensemble documentaire. Sois factuel et précis dans l'analyse. 

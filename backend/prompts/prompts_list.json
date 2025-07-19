@@ -22,6 +22,72 @@
     "content_file": "pdf_word_summary_fr.txt",
     "max_chars": 4000,
     "document_types": ["pdf", "docx", "doc"]
+  },
+  {
+    "id": "data_extraction_fr",
+    "title": "Extraction de Données",
+    "category": "Extraction",
+    "language": "fr",
+    "description": "Extraction structurée d'informations spécifiques du document.",
+    "system_role": "Expert en extraction de données structurées, spécialisé dans l'identification et l'organisation d'informations clés.",
+    "user_prompt": "",
+    "content_file": "data_extraction_fr.txt",
+    "max_chars": 5000,
+    "document_types": ["pdf", "docx", "doc", "xls", "xlsx"]
+  },
+  {
+    "id": "document_classification_fr",
+    "title": "Classification de Documents",
+    "category": "Classification",
+    "language": "fr",
+    "description": "Classification automatique selon type, secteur, urgence et confidentialité.",
+    "system_role": "Expert en classification documentaire, spécialisé dans la catégorisation automatique selon multiples critères.",
+    "user_prompt": "",
+    "content_file": "document_classification_fr.txt",
+    "max_chars": 3000,
+    "document_types": ["pdf", "docx", "doc", "eml"]
+  },
+  {
+    "id": "document_comparison_fr",
+    "title": "Comparaison de Documents",
+    "category": "Analyse",
+    "language": "fr",
+    "description": "Analyse comparative détaillée de deux ou plusieurs documents (contrats, polices d'assurance, etc.).",
+    "system_role": "Expert en analyse comparative de documents juridiques et contractuels, spécialisé dans l'identification des différences, similitudes et points d'attention critiques.",
+    "user_prompt": "",
+    "content_file": "document_comparison_fr.txt",
+    "max_chars": 6000,
+    "document_types": ["pdf", "docx", "doc"],
+    "multi_document": true,
+    "min_documents": 2
+  },
+  {
+    "id": "multi_document_synthesis_fr",
+    "title": "Synthèse Multi-Documents",
+    "category": "Synthèse",
+    "language": "fr",
+    "description": "Synthèse globale et transversale de plusieurs documents.",
+    "system_role": "Expert en synthèse documentaire, spécialisé dans l'analyse transversale et la création de synthèses actionnables.",
+    "user_prompt": "",
+    "content_file": "multi_document_synthesis_fr.txt",
+    "max_chars": 7000,
+    "document_types": ["pdf", "docx", "doc", "eml"],
+    "multi_document": true,
+    "min_documents": 2
+  },
+  {
+    "id": "difference_detection_fr",
+    "title": "Détection de Différences",
+    "category": "Analyse",
+    "language": "fr",
+    "description": "Identification précise des différences et contradictions entre documents.",
+    "system_role": "Expert en analyse comparative, spécialisé dans la détection de différences et l'identification de points critiques.",
+    "user_prompt": "",
+    "content_file": "difference_detection_fr.txt",
+    "max_chars": 6000,
+    "document_types": ["pdf", "docx", "doc"],
+    "multi_document": true,
+    "min_documents": 2
   }
 ]
 

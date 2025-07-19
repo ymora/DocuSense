@@ -1,0 +1,25 @@
+Analyse le document fourni et extrait les informations suivantes de manière structurée :
+
+1. **Informations d'identification** :
+   - Titre du document
+   - Date de création/modification
+   - Auteur/émetteur
+   - Destinataire(s)
+
+2. **Données clés** :
+   - Montants financiers mentionnés
+   - Dates importantes
+   - Noms de personnes/organisations
+   - Références contractuelles
+
+3. **Points d'action** :
+   - Actions requises
+   - Échéances
+   - Responsabilités assignées
+
+4. **Classification** :
+   - Type de document
+   - Urgence/priorité
+   - Secteur d'activité
+
+Présente les résultats sous forme de liste structurée avec des sections claires. Sois précis et factuel dans l'extraction des informations. 

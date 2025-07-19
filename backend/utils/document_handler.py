@@ -14,7 +14,8 @@ from flask import current_app
 import email
 from config import Config
 from werkzeug.utils import secure_filename
-from backend.utils.openai_utils import call_openai_api
+from utils.openai_utils import call_openai_api
+from utils.local_ai import local_ai
 
 
 # ---------- Lecture de fichiers selon leur type ----------
@@ -91,7 +92,7 @@ def file_hash(path, block_size=65536):
     return sha256.hexdigest()
 
 
-# ---------- Analyse OpenAI avec prompt ----------
+# ---------- Analyse avec IA (OpenAI ou Locale) ----------
 def load_prompts_metadata(prompts_json_path):
     if not os.path.exists(prompts_json_path):
         return []
@@ -99,7 +100,7 @@ def load_prompts_metadata(prompts_json_path):
         prompts = json.load(f)
     return prompts
 
-def analyse_document_with_text(text, prompt_id):
+def analyse_document_with_text(text, prompt_id, ia_mode="openai"):
     if not os.path.exists(Config.PROMPTS_JSON):
         raise FileNotFoundError("Fichier de prompt introuvable")
 
@@ -131,57 +132,150 @@ def analyse_document_with_text(text, prompt_id):
     max_chars = prompt_meta.get("max_chars", 4000)
     final_prompt = f"{prompt_content}\n\nContenu du document :\n{text[:max_chars]}"
 
-    response = call_openai_api(final_prompt, prompt_meta["system_role"])
-
-    return response.strip()
-
+    # Choisir le mode d'IA
+    if ia_mode == "local":
+        if not local_ai.is_available():
+            return {
+                "success": False,
+                "error": "IA locale non disponible. Vérifiez qu'Ollama est installé et en cours d'exécution."
+            }
+        
+        result = local_ai.analyze_document(final_prompt, prompt_meta["system_role"])
+        if result.get("success"):
+            return result.get("analysis", "")
+        else:
+            raise Exception(result.get("error", "Erreur IA locale"))
+    else:
+        # Mode OpenAI par défaut
+        response = call_openai_api(final_prompt, prompt_meta["system_role"])
+        return response.strip()
 
 
 # ---------- Traitement complet ----------
-def process_document(file, prompt_id, use_ocr=False):
-    upload_dir = current_app.config["UPLOAD_FOLDER"]
-    archive_dir = current_app.config["ARCHIVE_FOLDER"]
-
-    filename = secure_filename(file.filename)
-    temp_path = os.path.join(upload_dir, f"temp_{filename}")
-    file.save(temp_path)  # on écrase si déjà présent
-
-    h = file_hash(temp_path)
-    ext = os.path.splitext(filename)[1].lower()
-    date_str = datetime.now().strftime("%y%m%d")
-    new_filename = f"{date_str}-{h}-{filename}"
-    final_path = os.path.join(upload_dir, new_filename)
-
-    if not os.path.exists(final_path):
-        os.rename(temp_path, final_path)
-    else:
-        os.remove(temp_path)
-
+def process_document(file_path, prompt_id, ia_mode="openai", use_ocr=False):
+    """Traite un document avec l'IA spécifiée"""
     try:
-        doc_text = read_file(final_path)
+        # Lire le contenu du fichier
+        doc_text = read_file(file_path)
+        
         if not doc_text.strip():
             if not use_ocr:
                 return {
+                    "success": False,
                     "confirmation_required": True,
                     "message": "Pas de texte détecté. Voulez-vous extraire le texte avec OCR ?"
                 }
-            doc_text = perform_ocr(final_path)
+            doc_text = perform_ocr(file_path)
 
-        result = analyse_document_with_text(doc_text, prompt_id)
-
-        archive_path = os.path.join(archive_dir, new_filename)
-        if not os.path.exists(archive_path):
-            shutil.move(final_path, archive_path)
-        else:
-            os.remove(final_path)
-
-        return {"resultat": result}
+        # Analyser avec l'IA
+        result = analyse_document_with_text(doc_text, prompt_id, ia_mode)
+        
+        return {
+            "success": True,
+            "analysis": result,
+            "ia_mode": ia_mode
+        }
 
     except Exception as e:
-        failed_filename = f"{date_str}-{h}-{filename}-failed{ext}"
-        failed_path = os.path.join(upload_dir, failed_filename)
-        if os.path.exists(failed_path):
-            os.remove(failed_path)
-        if os.path.exists(final_path):
-            os.rename(final_path, failed_path)
-        raise e
+        return {
+            "success": False,
+            "error": str(e)
+        }
+
+
+# ---------- Traitement multi-documents ----------
+def process_multiple_documents(file_paths, prompt_id, ia_mode="openai", use_ocr=False):
+    """Traite plusieurs documents avec l'IA pour comparaison"""
+    try:
+        # Lire le contenu de tous les fichiers
+        documents_content = []
+        
+        for file_path in file_paths:
+            try:
+                doc_text = read_file(file_path)
+                
+                if not doc_text.strip():
+                    if not use_ocr:
+                        return {
+                            "success": False,
+                            "confirmation_required": True,
+                            "message": f"Pas de texte détecté dans {os.path.basename(file_path)}. Voulez-vous extraire le texte avec OCR ?"
+                        }
+                    doc_text = perform_ocr(file_path)
+                
+                # Ajouter le nom du fichier et son contenu
+                documents_content.append({
+                    "name": os.path.basename(file_path),
+                    "path": file_path,
+                    "content": doc_text
+                })
+                
+            except Exception as e:
+                return {
+                    "success": False,
+                    "error": f"Erreur lors de la lecture de {os.path.basename(file_path)}: {str(e)}"
+                }
+        
+        # Charger le prompt
+        if not os.path.exists(Config.PROMPTS_JSON):
+            raise FileNotFoundError("Fichier de prompt introuvable")
+
+        with open(Config.PROMPTS_JSON, "r", encoding="utf-8") as f:
+            prompts = json.load(f)
+
+        prompt_meta = next((p for p in prompts if p["id"] == prompt_id), None)
+        if not prompt_meta:
+            raise ValueError(f"Prompt introuvable : {prompt_id}")
+
+        prompt_filename = prompt_meta.get("content_file")
+        if not prompt_filename:
+            raise ValueError("Le champ 'content_file' est manquant")
+
+        prompt_path = os.path.join(Config.PROMPT_CONTENT_DIR, prompt_filename)
+        if not os.path.exists(prompt_path):
+            raise FileNotFoundError(f"Fichier de prompt manquant : {prompt_path}")
+
+        with open(prompt_path, "r", encoding="utf-8") as f:
+            prompt_content = f.read()
+
+        # Préparer le contenu des documents pour le prompt
+        documents_text = ""
+        for i, doc in enumerate(documents_content, 1):
+            documents_text += f"\n--- DOCUMENT {i}: {doc['name']} ---\n"
+            documents_text += doc['content']
+            documents_text += "\n"
+
+        max_chars = prompt_meta.get("max_chars", 6000)
+        final_prompt = f"{prompt_content}\n\n{documents_text[:max_chars]}"
+
+        # Choisir le mode d'IA
+        if ia_mode == "local":
+            if not local_ai.is_available():
+                return {
+                    "success": False,
+                    "error": "IA locale non disponible. Vérifiez qu'Ollama est installé et en cours d'exécution."
+                }
+            
+            result = local_ai.analyze_document(final_prompt, prompt_meta["system_role"])
+            if result.get("success"):
+                return {
+                    "success": True,
+                    "analysis": result.get("analysis", ""),
+                    "ia_mode": ia_mode
+                }
+            else:
+                raise Exception(result.get("error", "Erreur IA locale"))
+        else:
+            # Mode OpenAI par défaut
+            response = call_openai_api(final_prompt, prompt_meta["system_role"])
+            return {
+                "success": True,
+                "analysis": response.strip(),
+                "ia_mode": ia_mode
+            }
+
+    except Exception as e:
+        return {
+            "success": False,
+            "error": str(e)
+        }

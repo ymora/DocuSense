@@ -1,8 +1,13 @@
 # === Librairies principales pour DocuSense ===
 Flask>=2.3.0                   # Framework web léger pour créer l'API backend
+flask-cors>=4.0.0              # Extension Flask pour gérer CORS (Cross-Origin Resource Sharing)
 Werkzeug>=2.3.0                # Fournit secure_filename et d'autres outils WSGI
 openai>=1.2.3                  # Client officiel OpenAI pour interagir avec GPT (chat/completions)
-python-dotenv>=1.0.0           # Charge les variables d’environnement depuis un fichier .env
+python-dotenv>=1.0.0           # Charge les variables d'environnement depuis un fichier .env
+
+# === IA Locale avec Ollama ===
+ollama>=0.1.7                  # Client Python pour Ollama (IA locale)
+requests>=2.25.0               # Pour les appels HTTP vers Ollama
 
 # === Lecture et traitement de documents ===
 python-docx>=0.8.11            # Pour lire et extraire le texte des fichiers Word (.docx)
@@ -17,7 +22,7 @@ xlrd>=2.0.1                   # Nécessaire pour lire les anciens fichiers Excel
 chardet>=5.1.0                # Pour détecter automatiquement l'encodage de fichiers texte (.txt)
 
 # === Librairies pour traitement PDF scanné / OCR ===
-Pillow>=9.0.0                 # Librairie d’image Python (fork de PIL)
+Pillow>=9.0.0                 # Librairie d'image Python (fork de PIL)
 pdf2image>=1.16.0             # Convertit les pages PDF en images (utile pour OCR)
 pytesseract>=0.3.10           # Wrapper Python pour Tesseract OCR
 

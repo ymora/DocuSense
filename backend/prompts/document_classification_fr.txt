@@ -1,0 +1,39 @@
+Analyse le document fourni et effectue une classification détaillée selon les critères suivants :
+
+**Classification par type de document :**
+- Contrat/Accord
+- Facture/Devis
+- Rapport/Analyse
+- Communication/Email
+- Formulaire/Questionnaire
+- Manuel/Guide
+- Présentation
+- Autre (préciser)
+
+**Classification par secteur d'activité :**
+- Juridique
+- Financier/Comptable
+- Commercial/Marketing
+- Technique/IT
+- RH/Administratif
+- Médical/Santé
+- Éducatif/Formation
+- Autre (préciser)
+
+**Classification par urgence :**
+- Critique (action immédiate requise)
+- Important (action dans les 48h)
+- Normal (action dans la semaine)
+- Informatif (pas d'action requise)
+
+**Classification par confidentialité :**
+- Public
+- Interne
+- Confidentiel
+- Très confidentiel
+
+**Mots-clés** : Liste de 5-10 mots-clés représentatifs du contenu
+
+**Résumé de classification** : Justification brève de la classification choisie
+
+Présente les résultats sous forme de tableau structuré avec les différentes catégories. 

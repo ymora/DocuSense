@@ -1,0 +1,36 @@
+Compare les documents fournis et identifie précisément les différences et similitudes :
+
+**Analyse comparative structurée :**
+
+1. **Similitudes identifiées :**
+   - Contenu identique ou très similaire
+   - Structure commune
+   - Terminologie partagée
+   - Objectifs similaires
+
+2. **Différences majeures :**
+   - Contenu spécifique à chaque document
+   - Modifications de version
+   - Ajouts/suppressions importantes
+   - Changements de contexte
+
+3. **Points critiques :**
+   - Contradictions entre documents
+   - Incohérences de données
+   - Clauses différentes
+   - Conditions divergentes
+
+4. **Analyse détaillée par section :**
+   - Comparaison section par section
+   - Identification des modifications
+   - Impact des différences
+
+5. **Recommandations :**
+   - Actions de réconciliation nécessaires
+   - Points d'attention particuliers
+   - Documents de référence à privilégier
+
+**Tableau de comparaison :**
+- Section | Document A | Document B | Différences | Impact
+
+Présente une analyse factuelle et détaillée des différences, en identifiant clairement les points d'attention critiques. 
